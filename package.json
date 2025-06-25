@@ -1,0 +1,27 @@
+{
+  "name": "Hyfa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon -w src src/index.ts",
+    "start": "tsc && node dist/index.js",
+    "setup": "npm install --include=dev"
+  },
+  "keywords": [],
+  "author": "HackYo",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^4.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4",
+    "@types/node": "^24.0.3"
+  }
+}
