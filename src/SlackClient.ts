@@ -37,17 +37,7 @@ export class DefaultSlackClient {
   onDirectMessage(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
-
-      if (
-        slackMessage.subtype === 'bot_message' ||
-        slackMessage.subtype === 'message_changed' ||
-        slackMessage.subtype === 'message_deleted' ||
-        slackMessage.user === this.botUserId
-      ) {
-        return;
-      }
-
-      if (slackMessage.channel_type === 'im' && slackMessage.text) {
+      if (this.shouldProcessMessage(slackMessage, 'im')) {
         handler(slackMessage);
       }
     });
@@ -56,21 +46,7 @@ export class DefaultSlackClient {
   onGroupMessageTag(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
-
-      if (
-        slackMessage.subtype === 'bot_message' ||
-        slackMessage.subtype === 'message_changed' ||
-        slackMessage.subtype === 'message_deleted' ||
-        slackMessage.user === this.botUserId
-      ) {
-        return;
-      }
-
-      if (
-        slackMessage.channel_type === 'group' &&
-        slackMessage.text &&
-        slackMessage.text.includes(`<@${this.botUserId}>`)
-      ) {
+      if (this.shouldProcessMessage(slackMessage, 'group', `<@${this.botUserId}>`)) {
         handler(slackMessage);
       }
     });
@@ -129,5 +105,27 @@ export class DefaultSlackClient {
 
   async deleteTypingIndicator(channelId: string, ts: string): Promise<void> {
     await this.app.client.chat.delete({ channel: channelId, ts });
+  }
+
+  private shouldProcessMessage(
+    slackMessage: GenericMessageEvent,
+    channelType: string,
+    textIncludes?: string
+  ): boolean {
+    if (
+      slackMessage.subtype === 'bot_message' ||
+      slackMessage.subtype === 'message_changed' ||
+      slackMessage.subtype === 'message_deleted' ||
+      slackMessage.user === this.botUserId
+    ) {
+      return false;
+    }
+    if (slackMessage.channel_type !== channelType || !slackMessage.text) {
+      return false;
+    }
+    if (textIncludes && !slackMessage.text.includes(textIncludes)) {
+      return false;
+    }
+    return true;
   }
 }
