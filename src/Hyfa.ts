@@ -64,7 +64,7 @@ export class Hyfa {
       });
 
       // Send response to user
-      await this.slackClient.sendMessage(message.user, LLMResponse, message.thread_ts);
+      await this.slackClient.sendMessage(message.channel, LLMResponse, message.thread_ts);
 
       // Delete typing indicator
       if (typingIndicatorTS) {
@@ -81,6 +81,7 @@ export class Hyfa {
       return;
     }
 
+    console.log('Received group message:', message);
     if (message.thread_ts) {
       // get the thread messages
       const threadMessages = await this.slackClient.getThreadMessages(
@@ -124,7 +125,7 @@ export class Hyfa {
     let formattedResponse = response.replace(/\*\*(.+)\*\*/g, '*$1*');
 
     // Remove language tags from code blocks (Not supported in Slack)
-    formattedResponse = formattedResponse.replace(/```(.+?)\n/g, '*$1*:\n```\n');
+    formattedResponse = formattedResponse.replace(/```([^`]+?)\n/g, '*$1*:\n```\n');
     return formattedResponse;
   }
 
