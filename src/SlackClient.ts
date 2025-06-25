@@ -1,11 +1,12 @@
 import { App } from '@slack/bolt';
 import { GenericMessageEvent, ConversationsHistoryResponse } from '@slack/web-api';
 
-export type SlackMessage = NonNullable<ConversationsHistoryResponse['messages']>;
+export type SlackMessage = NonNullable<ConversationsHistoryResponse['messages']>[0];
 export type SlackMessageEvent = GenericMessageEvent;
 export type MessageHandler = (message: SlackMessageEvent) => void;
 
 export interface SlackClient {
+  botUserId?: string;
   start(): Promise<void>;
   onDirectMessage(handler: MessageHandler): void;
   onGroupMessageTag(handler: MessageHandler): void;
@@ -17,8 +18,9 @@ export interface SlackClient {
 }
 
 export class DefaultSlackClient {
+  botUserId: string | undefined;
   private readonly app: App;
-  private botUserId: string | undefined;
+
   constructor(options: { token: string; signingSecret: string; appToken: string }) {
     this.app = new App({
       socketMode: true,
@@ -123,7 +125,12 @@ export class DefaultSlackClient {
     if (slackMessage.channel_type !== channelType || !slackMessage.text) {
       return false;
     }
-    if (textIncludes && !slackMessage.text.includes(textIncludes)) {
+
+    // Check if the message is a thread reply and the bot is the thread starter
+    const isThreadReplyToBot =
+      slackMessage.thread_ts && slackMessage.parent_user_id === this.botUserId;
+
+    if (textIncludes && !slackMessage.text.includes(textIncludes) && !isThreadReplyToBot) {
       return false;
     }
     return true;
