@@ -139,7 +139,7 @@ export class Hyfa {
     let formattedResponse = response.replace(/\*\*(.+)\*\*/g, '*$1*');
 
     // Remove language tags from code blocks (Not supported in Slack)
-    formattedResponse = formattedResponse.replace(/```([^`]+?)\n/g, '*$1*:\n```\n');
+    formattedResponse = formattedResponse.replace(/```([a-zA-Z0-9\#\+\-]+?)\n/g, '*$1*:\n```\n');
     return formattedResponse;
   }
 
