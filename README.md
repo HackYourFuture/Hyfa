@@ -19,7 +19,7 @@ Hyfa is designed to be accessible, friendly, and professional – always ready t
 ### How to use Hyfa
 * You can send a private message to @hyfa at any time and she will respond in no time. 
 
-* If Hyfais a member of a Slack channel (private or public), you can tag her with @hyfa to get her attention to your question, she will look at the recent channel messages and try to provide the best answer.
+* If Hyfa is a member of a Slack channel (private or public), you can tag her with @hyfa to get her attention to your question, she will look at the recent channel messages and try to provide the best answer.
 
 * You can also tag @hyfa inside a Slack thread if you want her to join the conversation. Threads only work for group channels
 
