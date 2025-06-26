@@ -3,6 +3,7 @@ import { LLMMessage, LLMService } from './LLMService';
 import { HistoryProvider } from './HistoryProvider';
 
 export class Hyfa {
+  private counter = 0;
   constructor(
     private readonly slackClient: SlackClient,
     private readonly llmService: LLMService,
@@ -11,14 +12,31 @@ export class Hyfa {
 
   async start(): Promise<void> {
     // Set up message handlers
-    this.slackClient.onDirectMessage(this.setupDirectMessageHandler.bind(this));
-    this.slackClient.onGroupMessageTag(this.setupGroupMessageHandler.bind(this));
+    this.slackClient.onDirectMessage(async (message) => {
+      try {
+        await this.directMessageHandler(message);
+        this.counter++;
+        console.log(`✅ Processed direct message. Total messages: ${this.counter}`);
+      } catch (error) {
+        console.error('❌ Error in direct message handler:', error);
+      }
+    });
+
+    this.slackClient.onGroupMessageTag(async (message) => {
+      try {
+        await this.groupMessageHandler(message);
+        this.counter++;
+        console.log(`✅ Processed group message. Total messages: ${this.counter}`);
+      } catch (error) {
+        console.error('❌ Error in group message handler:', error);
+      }
+    });
 
     // Start the Slack client
     await this.slackClient.start();
   }
 
-  private async setupDirectMessageHandler(message: SlackMessageEvent): Promise<void> {
+  private async directMessageHandler(message: SlackMessageEvent): Promise<void> {
     if (!message.text?.trim()) {
       return;
     }
@@ -32,51 +50,47 @@ export class Hyfa {
       return;
     }
 
-    try {
-      let typingIndicatorTS: string | undefined = await this.slackClient.sendTypingIndicator(
-        message.channel
-      );
+    let typingIndicatorTS: string | undefined = await this.slackClient.sendTypingIndicator(
+      message.channel
+    );
 
-      // Safety timeout to delete typing indicator after 60 seconds
-      // This is to ensure that if the message is stuck or error occurs, we still clean up the typing indicator
-      setTimeout(() => {
-        if (typingIndicatorTS) {
-          this.slackClient.deleteTypingIndicator(message.channel, typingIndicatorTS);
-          typingIndicatorTS = undefined;
-        }
-      }, 60000);
-
-      // Get conversation history for this user
-      const history = await this.historyProvider.getHistory(message.user);
-
-      // Generate response from LLM
-      let LLMResponse = await this.llmService.generate(message.text, history);
-      LLMResponse = this.formatResponse(LLMResponse);
-
-      // Add message to history
-      await this.historyProvider.pushHistory(message.user, {
-        role: 'user',
-        content: message.text,
-      });
-      await this.historyProvider.pushHistory(message.user, {
-        role: 'assistant',
-        content: LLMResponse,
-      });
-
-      // Send response to user
-      await this.slackClient.sendMessage(message.channel, LLMResponse, message.thread_ts);
-
-      // Delete typing indicator
+    // Safety timeout to delete typing indicator after 60 seconds
+    // This is to ensure that if the message is stuck or error occurs, we still clean up the typing indicator
+    setTimeout(() => {
       if (typingIndicatorTS) {
-        await this.slackClient.deleteTypingIndicator(message.channel, typingIndicatorTS);
+        this.slackClient.deleteTypingIndicator(message.channel, typingIndicatorTS);
         typingIndicatorTS = undefined;
       }
-    } catch (error) {
-      console.error('Error processing message:', error);
+    }, 60000);
+
+    // Get conversation history for this user
+    const history = await this.historyProvider.getHistory(message.user);
+
+    // Generate response from LLM
+    let LLMResponse = await this.llmService.generate(message.text, history);
+    LLMResponse = this.formatResponse(LLMResponse);
+
+    // Add message to history
+    await this.historyProvider.pushHistory(message.user, {
+      role: 'user',
+      content: message.text,
+    });
+    await this.historyProvider.pushHistory(message.user, {
+      role: 'assistant',
+      content: LLMResponse,
+    });
+
+    // Send response to user
+    await this.slackClient.sendMessage(message.channel, LLMResponse, message.thread_ts);
+
+    // Delete typing indicator
+    if (typingIndicatorTS) {
+      await this.slackClient.deleteTypingIndicator(message.channel, typingIndicatorTS);
+      typingIndicatorTS = undefined;
     }
   }
 
-  private async setupGroupMessageHandler(message: SlackMessageEvent): Promise<void> {
+  private async groupMessageHandler(message: SlackMessageEvent): Promise<void> {
     if (!message.text?.trim()) {
       return;
     }

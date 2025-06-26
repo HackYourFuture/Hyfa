@@ -1,6 +1,29 @@
-# Hyfa
+# Meet Hyfa
+<p align="center">
+  <img src="Resources/Hyfa.jpeg" alt="Hyfa Avatar" width="200" height="200" style="border-radius: 50%;">
+</p>
+Hyfa (HackYourFuture Assistant) is an AI-powered Slack bot designed to serve as a virtual mentor for HackYourFuture.
 
-A Slack bot powered by AI.
+Hyfa provides guidance, support, and resources to trainees throughout their coding journey, helping them navigate the curriculum and overcome technical challenges while encouraging independent problem-solving and growth.
+
+### What Hyfa Can Help With
+
+- Understanding web development concepts (HTML, CSS, JavaScript, Node.js, React.js, databases)
+- Providing hints and guidance for coding problems without giving away complete solutions
+- Offering advice on study methods and debugging strategies
+- Supporting job search preparation, including CV building and interview tips
+- Answering general questions about life in the Netherlands
+
+Hyfa is designed to be accessible, friendly, and professional – always ready to assist but careful to empower students to develop their own problem-solving skills.
+
+### How to use Hyfa
+* You can send a private message to @hyfa at any time and she will respond in no time. 
+
+* If @hyfa is a member of a channel, you can tag her with @hyfa to get her attention to your question, she will look at the recent channel messages and try to provide the best answer.
+
+* You can also tag @hyfa inside a Slack thread if you want her to join the conversation. Threads only work for group channels
+
+* Creating a private group with multiple trainees? Why not adding Hyfa to help out if needed
 
 ## Environment Setup
 

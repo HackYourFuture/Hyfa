@@ -39,7 +39,7 @@ export class DefaultSlackClient {
   onDirectMessage(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
-      if (this.shouldProcessMessage(slackMessage, 'im')) {
+      if (this.shouldProcessMessage(slackMessage, ['im'])) {
         handler(slackMessage);
       }
     });
@@ -48,7 +48,7 @@ export class DefaultSlackClient {
   onGroupMessageTag(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
-      if (this.shouldProcessMessage(slackMessage, 'group', `<@${this.botUserId}>`)) {
+      if (this.shouldProcessMessage(slackMessage, ['group', 'mpim'], `<@${this.botUserId}>`)) {
         handler(slackMessage);
       }
     });
@@ -111,7 +111,7 @@ export class DefaultSlackClient {
 
   private shouldProcessMessage(
     slackMessage: GenericMessageEvent,
-    channelType: string,
+    channelTypes: string[],
     textIncludes?: string
   ): boolean {
     if (
@@ -122,7 +122,8 @@ export class DefaultSlackClient {
     ) {
       return false;
     }
-    if (slackMessage.channel_type !== channelType || !slackMessage.text) {
+
+    if (!channelTypes.includes(slackMessage.channel_type) || !slackMessage.text) {
       return false;
     }
 
