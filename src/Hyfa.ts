@@ -95,7 +95,6 @@ export class Hyfa {
       return;
     }
 
-    console.log('Received group message:', message);
     if (message.thread_ts) {
       // get the thread messages
       const threadMessages = await this.slackClient.getThreadMessages(
