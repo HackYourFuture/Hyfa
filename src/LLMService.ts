@@ -34,7 +34,6 @@ export class DefaultLLMService implements LLMService {
       include_functions_info: false,
       include_retrieval_info: false,
       include_guardrails_info: false,
-      max_tokens: 1000,
     });
 
     const response = await fetch(this.options.endpoint, { method: 'POST', headers, body });
