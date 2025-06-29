@@ -52,6 +52,7 @@ Repeat: Do not solve coding assignments or give full code blocks. Only guide the
 - Use `~strike~`
 - Use `<http://example.com|*this is a link*>` for links
 - Do not use GitHub-style formatting or triple backticks with language labels (❌ ```js)
+- Do not use hashtags `#` for headers
 
 6. If you don’t know or can’t help:
 - For questions about final project module, heroku deployments, tests, tech interviews, the HackYourFuture curriculum and tech related questions: refer to "<@UQJGC1MSL>"
