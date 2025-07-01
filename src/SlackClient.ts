@@ -47,6 +47,7 @@ export class DefaultSlackClient {
 
   onGroupMessageTag(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
+      console.log('Received message:', message);
       const slackMessage = message as GenericMessageEvent;
       if (this.shouldProcessMessage(slackMessage, ['group', 'mpim'], `<@${this.botUserId}>`)) {
         handler(slackMessage);
@@ -57,19 +58,19 @@ export class DefaultSlackClient {
   async getChannelHistory(channelId: string, limit: number): Promise<SlackMessage[]> {
     const result = await this.app.client.conversations.history({
       channel: channelId,
-      limit,
+      limit: limit * 2, // Fetch more messages to ensure we have enough after filtering
     });
-    if (!result.messages) {
-      return [];
-    }
 
-    return result.messages as SlackMessage[];
+    const slackMessages = (result.messages ?? []) as SlackMessage[];
+
+    // Return messages that have text and aren't system subtypes
+    return slackMessages.filter((msg) => msg.text?.trim() && !msg.subtype).slice(-limit);
   }
 
   async getThreadMessages(
     channelId: string,
     threadTs: string,
-    limit: number = 100
+    limit: number = 50
   ): Promise<SlackMessage[]> {
     const result = await this.app.client.conversations.replies({
       channel: channelId,
@@ -77,11 +78,10 @@ export class DefaultSlackClient {
       limit,
     });
 
-    if (!result.messages) {
-      return [];
-    }
+    const slackMessages = (result.messages ?? []) as SlackMessage[];
 
-    return result.messages as SlackMessage[];
+    // Return messages that have text and aren't system subtypes
+    return slackMessages.filter((msg) => msg.text?.trim() && !msg.subtype).slice(-limit);
   }
 
   async sendMessage(channelId: string, text: string, threadTs?: string | undefined): Promise<void> {
