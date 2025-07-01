@@ -47,7 +47,6 @@ export class DefaultSlackClient {
 
   onGroupMessageTag(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
-      console.log('Received message:', message);
       const slackMessage = message as GenericMessageEvent;
       if (this.shouldProcessMessage(slackMessage, ['group', 'mpim'], `<@${this.botUserId}>`)) {
         handler(slackMessage);
