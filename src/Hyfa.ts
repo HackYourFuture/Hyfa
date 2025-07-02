@@ -64,21 +64,44 @@ export class Hyfa {
     }, 60000);
 
     // Get conversation history for this user
-    const history = await this.historyProvider.getHistory(message.user);
+    let history = await this.historyProvider.getHistory(message.user);
+
+    // If no history cached, try to fetch the last 20 messages from the channel
+    if (history.length === 0) {
+      const channelHistory = await this.slackClient.getChannelHistory(message.channel, 20);
+      history = channelHistory
+        .filter((msg) => msg.ts !== message.ts) // Exclude current message
+        .map((msg) => this.convertToLLMMessage(msg, this.slackClient.botUserId))
+        .reverse();
+
+      history.pop(); // Remove the last message to avoid including the current message in history
+      this.historyProvider.pushHistory(message.user, history);
+    }
 
     // Generate response from LLM
+    const llmStartTime = performance.now();
     let LLMResponse = await this.llmService.generate(message.text, history);
+    const llmEndTime = performance.now();
+    const llmResponseTime = ((llmEndTime - llmStartTime) / 1000).toFixed(1);
+
     LLMResponse = this.formatResponse(LLMResponse);
 
     // Add message to history
-    await this.historyProvider.pushHistory(message.user, {
-      role: 'user',
-      content: message.text,
-    });
-    await this.historyProvider.pushHistory(message.user, {
-      role: 'assistant',
-      content: LLMResponse,
-    });
+    await this.historyProvider.pushHistory(message.user, [
+      {
+        role: 'user',
+        content: message.text,
+      },
+      {
+        role: 'assistant',
+        content: LLMResponse,
+      },
+    ]);
+
+    if (process.env.NODE_ENV === 'development') {
+      // In development, log the formatted response
+      LLMResponse += `\n-----------------------------------\n_(LLM response time ${llmResponseTime}s)_`;
+    }
 
     // Send response to user
     await this.slackClient.sendMessage(message.channel, LLMResponse, message.thread_ts);

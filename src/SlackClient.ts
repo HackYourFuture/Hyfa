@@ -40,7 +40,18 @@ export class DefaultSlackClient {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
       if (this.shouldProcessMessage(slackMessage, ['im'])) {
+        console.debug(
+          `✅[D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+            slackMessage.channel_type
+          } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
+        );
         handler(slackMessage);
+      } else {
+        console.debug(
+          `❌[D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+            slackMessage.channel_type
+          } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
+        );
       }
     });
   }
@@ -49,7 +60,18 @@ export class DefaultSlackClient {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
       if (this.shouldProcessMessage(slackMessage, ['group', 'mpim'], `<@${this.botUserId}>`)) {
+        console.debug(
+          `✅[G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+            slackMessage.channel_type
+          } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
+        );
         handler(slackMessage);
+      } else {
+        console.debug(
+          `❌[G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+            slackMessage.channel_type
+          } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
+        );
       }
     });
   }
