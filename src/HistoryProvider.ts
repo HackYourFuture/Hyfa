@@ -2,7 +2,7 @@ import { LLMMessage } from './LLMService';
 
 export interface HistoryProvider {
   getHistory(slackID: string): Promise<LLMMessage[]>;
-  pushHistory(slackID: string, message: LLMMessage): Promise<void>;
+  pushHistory(slackID: string, messages: LLMMessage[]): Promise<void>;
 }
 
 export class MemoryHistoryProvider implements HistoryProvider {
@@ -14,19 +14,13 @@ export class MemoryHistoryProvider implements HistoryProvider {
   }
 
   async getHistory(slackID: string): Promise<LLMMessage[]> {
-    if (!this.history.has(slackID)) {
-      this.history.set(slackID, []);
-    }
-    return this.history.get(slackID) ?? [];
+    const historyArray = this.history.get(slackID) ?? [];
+    return [...historyArray];
   }
 
-  async pushHistory(slackID: string, message: LLMMessage): Promise<void> {
-    const messages = await this.getHistory(slackID);
-    messages.push(message);
-
-    // Keep only limited amount of message history.
-    if (messages.length > this.historySize) {
-      messages.splice(0, messages.length - this.historySize);
-    }
+  async pushHistory(slackID: string, messages: LLMMessage[]): Promise<void> {
+    const history = await this.getHistory(slackID);
+    const updatedHistory = history.concat(...messages).slice(-this.historySize);
+    this.history.set(slackID, updatedHistory);
   }
 }

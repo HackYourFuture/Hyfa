@@ -1,16 +1,16 @@
-import { DefaultSlackClient } from "./SlackClient";
-import { DefaultLLMService } from "./LLMService";
-import { MemoryHistoryProvider } from "./HistoryProvider";
-import { Hyfa } from "./Hyfa";
-import dotenv from "dotenv";
+import { DefaultSlackClient } from './SlackClient';
+import { DefaultLLMService } from './LLMService';
+import { MemoryHistoryProvider } from './HistoryProvider';
+import { Hyfa } from './Hyfa';
+import dotenv from 'dotenv';
 
 // Config
 dotenv.config();
-const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN || "";
-const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET || "";
-const SLACK_APP_TOKEN = process.env.SLACK_APP_TOKEN || "";
-const LLM_API_ENDPOINT = process.env.LLM_API_ENDPOINT || "";
-const LLM_API_TOKEN = process.env.LLM_API_TOKEN || "";
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN || '';
+const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET || '';
+const SLACK_APP_TOKEN = process.env.SLACK_APP_TOKEN || '';
+const LLM_API_ENDPOINT = process.env.LLM_API_ENDPOINT || '';
+const LLM_API_TOKEN = process.env.LLM_API_TOKEN || '';
 
 const main = async () => {
   // Validate required environment variables
@@ -21,9 +21,7 @@ const main = async () => {
     !LLM_API_ENDPOINT ||
     !LLM_API_TOKEN
   ) {
-    throw new Error(
-      "Missing required environment variables. Please check your .env file."
-    );
+    throw new Error('Missing required environment variables. Please check your .env file.');
   }
 
   const historyProvider = new MemoryHistoryProvider({ historySize: 20 });
@@ -43,10 +41,10 @@ const main = async () => {
 
   const hyfaClient = new Hyfa(slackClient, llmService, historyProvider);
   await hyfaClient.start();
-  console.log("🟢 Hyfa bot started successfully");
+  console.log('🟢 Hyfa bot started successfully');
 };
 
 main().catch((error) => {
-  console.error("Error starting Hyfa bot:", error);
+  console.error('Error starting Hyfa bot:', error);
   process.exit(1);
 });
