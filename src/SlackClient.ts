@@ -41,14 +41,14 @@ export class DefaultSlackClient {
       const slackMessage = message as GenericMessageEvent;
       if (this.shouldProcessMessage(slackMessage, ['im'])) {
         console.debug(
-          `✅[D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+          `✅ [D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
             slackMessage.channel_type
           } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
         );
         handler(slackMessage);
       } else {
         console.debug(
-          `❌[D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+          `❌ [D] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
             slackMessage.channel_type
           } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
         );
