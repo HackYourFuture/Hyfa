@@ -59,16 +59,17 @@ export class DefaultSlackClient {
   onGroupMessageTag(handler: MessageHandler): void {
     this.app.message(async ({ message }) => {
       const slackMessage = message as GenericMessageEvent;
-      if (this.shouldProcessMessage(slackMessage, ['group', 'mpim'], `<@${this.botUserId}>`)) {
+      const supportedChannelTypes = ['group', 'mpim', 'channel'];
+      if (this.shouldProcessMessage(slackMessage, supportedChannelTypes, `<@${this.botUserId}>`)) {
         console.debug(
-          `✅[G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+          `✅ [G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
             slackMessage.channel_type
           } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
         );
         handler(slackMessage);
       } else {
         console.debug(
-          `❌[G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
+          `❌ [G] subtype:${slackMessage.subtype} channel:${slackMessage.channel} channel_type:${
             slackMessage.channel_type
           } user:${slackMessage.user} msg_length:${slackMessage.text?.length ?? 0}`
         );
