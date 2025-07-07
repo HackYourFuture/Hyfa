@@ -111,6 +111,7 @@ export class DefaultSlackClient {
       channel: channelId,
       text,
       thread_ts: threadTs,
+      unfurl_links: false,
     });
   }
 
